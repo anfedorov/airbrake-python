@@ -92,7 +92,13 @@ class Airbrake(object):
             version = platform.python_version()
             self._context.update({'language': 'Python %s' % version})
             # os
-            plat = platform.platform()
+            try:
+                plat = platform.platform()
+            except IOError as e:
+                if e.errno == 2:
+                    plat = os.environ['SERVER_SOFTWARE']
+                else:
+                    raise
             self._context.update({'os': plat})
             # env name
             self._context.update({'environment': self.environment})
